@@ -69,14 +69,15 @@ func getNote(id int64) (Note, error) {
 	if err != nil {
 		log.Fatal("Failed to get note: ", err)
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNotFound {
-		return Note{}, err
+		return Note{}, fmt.Errorf("note not found id: %d", id)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return Note{}, fmt.Errorf("failed to get node: %d", id)
+		return Note{}, fmt.Errorf("failed to get node: %d", resp.StatusCode)
 	}
 
 	var note Note
@@ -96,7 +97,7 @@ func main() {
 
 	note, err = getNote(note.ID)
 	if err != nil {
-		log.Fatal("Failed to get note:", err)
+		log.Fatal("Failed to get note: ", err)
 	}
 
 	log.Printf(color.RedString("Note info got:\n"), color.GreenString("%+v", note))
